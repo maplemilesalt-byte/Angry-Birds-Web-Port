@@ -1,113 +1,39 @@
-# Angry Birds Web
+# Angry Birds 1.0 — browser port
 
-**Preserving Angry Birds 1.0 for the modern web.**
+A port (not a remake) of the original **Angry Birds 1.0 for iPhone (December 2009)** to the browser.
 
-A browser-based port of the original Angry Birds iOS 1.0, developed through reverse engineering with REA (Reverse Engineer Anything).
+* The game's own compiled Lua 5.1 bytecode (`gamelogic.lua`, all `LevelN.lua`, `blocks.lua`,
+  `particles.lua`, `starLimits.lua`) is executed **unchanged** by a Lua 5.1 VM written in JavaScript
+  (`src/lua/`), configured like the original build (32-bit float numbers, `%.6g` number format).
+* All graphics, fonts, texts, sounds and music are read **directly from your original IPA** at runtime
+  (PVR RGBA4444 / PVRTC4 textures are decoded in the browser). Nothing from the game is redistributed
+  in this repository.
+* Only the native C++ engine layer was reimplemented, from REA/Ghidra decompilation of the original
+  ARM executable: the Lua bridge (`GameLua`), Box2D physics setup, the damage/scoring contact listener,
+  world/background/foreground renderers, particles, trajectories, bitmap fonts, text groups and audio.
+  See [`docs/REVERSE_ENGINEERING.md`](docs/REVERSE_ENGINEERING.md).
 
-The goal is to bring the original game to modern web browsers while preserving its original identity, mechanics, physics, assets, levels, and gameplay behavior.
+## Run
 
-## About
-
-Angry Birds Web is a reverse engineering and game preservation project focused on the original 2010 Angry Birds iOS release.
-
-Instead of creating a remake or an inspired clone, this project aims to understand the original application's internal structure and port its actual functionality to the browser.
-
-The original IPA serves as the primary reference for the port.
-
-## Goals
-
-- [x] Reverse engineer the original iOS application.
-- [x] Preserve original graphics and animations.
-- [x] Preserve original sound effects and music.
-- [x] Reproduce the original physics and gameplay.
-- [x] Recover original level data.
-- [x] Reproduce the original menus and interface.
-- [x] Support mouse and touchscreen controls.
-- [x] Run directly in modern web browsers.
-- [x] Avoid unnecessary external game engines.
-
-## Technology
-
-- JavaScript
-- HTML5
-- Canvas / WebGL
-- Web Audio API
-- Node.js
-- REA (Reverse Engineer Anything)
-
-## Running locally
-
-Requirements:
-
-- Node.js
-- npm
-
-Clone the repository:
-
-```bash
-git clone https://github.com/maplemilesalt-byte/angry-birds-web.git
-cd angry-birds-web
+```sh
+npm install          # planck.js (Box2D port); vendor/planck.mjs is already included
+npm start            # http://localhost:8080/
 ```
 
-Install dependencies if required:
+Place `Angry Birds 1.0.ipa` in the project root (it is fetched automatically), or pick the IPA with
+the file chooser shown on the page. Controls: touch / mouse (tap, drag the bird, drag to pan),
+pinch or mouse wheel to zoom — exactly the original touch scheme at the original 480×320 resolution
+(scaled to the window).
 
-```bash
-npm install
-```
+## Layout
 
-Start the development server:
-
-```bash
-npm start
-```
-
-By default, the server uses port 8080.
-
-If that port is already occupied, run:
-
-```bash
-node tools/serve.mjs 8087
-```
-
-Then open:
-
-```text
-http://localhost:8087
-```
-
-## Reverse Engineering
-
-The project uses REA (Reverse Engineer Anything) to investigate the original Angry Birds IPA.
-
-Areas of investigation include:
-
-- Executable analysis.
-- Application architecture.
-- Original resources and assets.
-- Game logic.
-- Physics behavior.
-- Level structures.
-- Audio resources.
-- Rendering and animations.
-
-## Project Philosophy
-
-**Port, don't recreate.**
-
-The intention is to preserve the original experience rather than produce a new game that merely looks similar.
-
-When original behavior can be recovered, it should be preserved. When platform-specific functionality must be reimplemented, it should match the original behavior as closely as possible.
-
-## Legal Notice
-
-Angry Birds and its associated intellectual property belong to their respective owners.
-
-This is an independent fan-made preservation and reverse engineering project. It is not affiliated with, endorsed by, or sponsored by Rovio Entertainment.
-
-Original proprietary game assets and IPA files are not included in this repository unless their redistribution is explicitly authorized.
-
-## License
-
-The licensing of original game resources and third-party components must be respected separately from the project's own source code.
-
-See the repository's license file for applicable terms.
+| Path | Purpose |
+|---|---|
+| `src/lua/undump.js` | Lua 5.1 binary chunk loader + disassembler |
+| `src/lua/vm.js`, `src/lua/stdlib.js` | Lua 5.1 VM (float32 numbers) and the stdlib subset the game uses |
+| `src/platform/zip.js`, `src/platform/pvr.js` | IPA reader, PVR texture decoder |
+| `src/engine/gamelua.js` | port of `GameLua` (physics bridge, contacts/damage, renderers) |
+| `src/engine/particles.js` | port of `Particles` |
+| `src/engine/resources.js`, `src/app.js` | ports of `game::Resources` / `LuaResources` / `GameApp` |
+| `src/engine/renderer.js` | Canvas 2D equivalent of the GL ES 2D render state |
+| `tools/` | disassembler, headless runner (software canvas), Playwright browser test, dev server |

@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<link rel="apple-touch-icon" href="Angry Birds Original 2009 Icon.webp">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Angry Birds 1.0 — browser port</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #000; color: #ddd; font: 14px/1.4 system-ui, sans-serif; overflow: hidden; }
+  body { display: flex; align-items: center; justify-content: center; }
+  #screen { display: block; touch-action: none; image-rendering: auto; background: #000; }
+  #overlay { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; pointer-events: none; }
+  #status { white-space: pre-wrap; text-align: center; max-width: 90vw; }
+  #pick { display: none; pointer-events: auto; }
+  body.need-ipa #pick { display: block; }
+  body.running #overlay { display: none; }
+</style>
+</head>
+<body>
+<canvas id="screen" width="480" height="320"></canvas>
+<div id="overlay">
+  <div id="status">Loading…</div>
+  <label id="pick">Original IPA: <input type="file" id="ipa" accept=".ipa,.zip"></label>
+</div>
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>
